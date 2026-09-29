@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио | fallenworked</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                fallenworked.dev
+            </h1>
+            <div class="flex items-center gap-4">
+                <a href="https://t.me/caxaold" target="_blank" class="text-slate-400 hover:text-white transition">
+                    <i class="fab font-lg fa-telegram"></i> @caxaold
+                </a>
+                <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Добавить кейс
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Category Filter -->
+        <div class="flex gap-2 overflow-x-auto pb-4 mb-8 border-b border-slate-800" id="categoryFilters">
+            <button onclick="filterCategory('all')" class="cat-btn active bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-medium transition">
+                Все
+            </button>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+            <!-- Проекты генерируются через JS -->
+        </div>
+    </main>
+
+    <!-- Modal Form (Добавление / Редактирование) -->
+    <div id="modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-xl font-bold mb-4" id="modalTitle">Добавить проект</h2>
+            
+            <form id="projectForm" onsubmit="saveProject(event)" class="space-y-4">
+                <input type="hidden" id="projectId">
+                
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Название проекта</label>
+                    <input type="text" id="title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Категория (произвольная)</label>
+                    <!-- Заменено с <select> на обычный <input> для добавления своих категорий -->
+                    <input type="text" id="category" placeholder="Например: Парсеры, Telegram-боты, Web" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Ссылка на GitHub / Репозиторий</label>
+                    <input type="url" id="githubUrl" placeholder="https://github.com/..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Краткое описание</label>
+                    <textarea id="description" rows="3" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition">Отмена</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Начальные данные: оставлен только парсер
+        let projects = [
+            {
+                id: 1,
+                title: "Multi-Threaded Auto Classifieds Scraper",
+                category: "Парсеры",
+                githubUrl: "https://github.com/fallenworked/auto-parser",
+                description: "Высокопроизводительный парсер объявлений (av.by / Drom / Auto.ru) с подменой TLS-отпечатков (curl_cffi) для обхода Cloudflare и экспортом в XLSX."
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'all' 
+                ? projects 
+                : projects.filter(p => p.category.toLowerCase() === currentFilter.toLowerCase());
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="text-slate-500 col-span-full text-center py-8">Проекты в этой категории не найдены.</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 hover:border-indigo-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-medium border border-indigo-500/20">
+                                    ${p.category}
+                                </span>
+                                <button onclick="deleteProject(${p.id})" class="text-slate-500 hover:text-rose-400 text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-2">${p.title}</h3>
+                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">${p.description}</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                            <a href="${p.githubUrl}" target="_blank" class="text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5">
+                                <i class="fab fa-github"></i> GitHub Fork / Код
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            renderFilters();
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('categoryFilters');
+            const categories = ['all', ...new Set(projects.map(p => p.category))];
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" 
+                        class="px-4 py-1.5 rounded-full text-sm font-medium transition whitespace-nowrap ${currentFilter === cat ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">
+                    ${cat === 'all' ? 'Все' : cat}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            currentFilter = cat;
+            renderProjects();
+        }
+
+        function openModal() {
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+            document.getElementById('modalTitle').innerText = 'Добавить проект';
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function saveProject(e) {
+            e.preventDefault();
+            const id = document.getElementById('projectId').value;
+            const title = document.getElementById('title').value;
+            const category = document.getElementById('category').value.trim();
+            const githubUrl = document.getElementById('githubUrl').value;
+            const description = document.getElementById('description').value;
+
+            if (id) {
+                const index = projects.findIndex(p => p.id == id);
+                projects[index] = { id: Number(id), title, category, githubUrl, description };
+            } else {
+                projects.push({
+                    id: Date.now(),
+                    title,
+                    category,
+                    githubUrl,
+                    description
+                });
+            }
+
+            closeModal();
+            renderProjects();
+        }
+
+        function deleteProject(id) {
+            if (confirm('Удалить этот проект?')) {
+                projects = projects.filter(p => p.id !== id);
+                renderProjects();
+            }
+        }
+
+        // Инициализация при загрузке
+        renderProjects();
+    </script>
+</body>
+</html>
