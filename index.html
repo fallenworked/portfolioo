@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио | Python & Web Developer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f17',
+                        cardBg: 'rgba(19, 27, 46, 0.75)',
+                        borderLine: 'rgba(255, 255, 255, 0.08)',
+                        emeraldAccent: '#10b981',
+                        skyAccent: '#38bdf8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0f17;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f3f4f6;
+        }
+
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(22, 30, 49, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 12px 30px -10px rgba(56, 189, 248, 0.15);
+        }
+
+        .glow-emerald {
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.3);
+        }
+
+        .glow-sky {
+            box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f17; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+        .modal-animate {
+            animation: modalFadeIn 0.25s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-gray-200">
+
+    <!-- Admin Control Bar (Hidden by Default) -->
+    <div id="adminBar" class="hidden bg-emerald-950/80 border-b border-emerald-500/30 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm text-emerald-300 transition-all duration-300 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 font-medium">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Режим Администратора активен</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-plus"></i> Добавить проект
+                </button>
+                <button onclick="openStatsModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-chart-line"></i> Аналитика
+                </button>
+                <button onclick="logoutAdmin()" class="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                    Выйти
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-borderLine">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-sky-500 p-0.5 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <div class="w-full h-full bg-darkBg rounded-[10px] flex items-center justify-center">
+                        <span class="font-mono font-bold text-sky-400 text-sm">&lt;/&gt;</span>
+                    </div>
+                </div>
+                <span class="font-bold text-lg text-white tracking-tight">
+                    Dev<span class="text-sky-400">Craft</span>
+                </span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
+                <a href="#projects" class="hover:text-white transition-colors">Работы</a>
+                <a href="#skills" class="hover:text-white transition-colors">Навыки</a>
+                <a href="#about" class="hover:text-white transition-colors">Обо мне</a>
+                <a href="#contacts" class="hover:text-white transition-colors">Контакты</a>
+            </nav>
+
+            <!-- Login / Profile Button -->
+            <div class="flex items-center gap-3">
+                <button id="authBtn" onclick="toggleAuthModal()" class="px-4 py-2 rounded-xl text-sm font-semibold border border-sky-500/30 text-sky-400 hover:bg-sky-500/10 hover:border-sky-500/60 transition-all flex items-center gap-2 min-h-[40px]">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                    <span>Вход</span>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-400 hover:text-white rounded-lg focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl" id="mobileMenuIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-borderLine bg-darkBg/95 backdrop-blur-xl px-4 pt-3 pb-5 space-y-3">
+            <a href="#projects" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-sky-400 text-sm font-medium">Работы</a>
+            <a href="#skills" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-sky-400 text-sm font-medium">Навыки</a>
+            <a href="#about" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-sky-400 text-sm font-medium">Обо мне</a>
+            <a href="#contacts" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-sky-400 text-sm font-medium">Контакты</a>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <section class="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+            <div class="text-center max-w-3xl mx-auto space-y-6">
+                <!-- Status Badge -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono tracking-wide">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Открыт для коммерческих заказов</span>
+                </div>
+
+                <!-- Main Title -->
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                    Разработка <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-400 to-indigo-400">Telegram-ботов</span>, Парсеров и Веб-сервисов
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="text-base sm:text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto">
+                    Создаю отказоустойчивые скрипты автоматизации, парсеры данных с обходом блокировок и современные веб-приложения под ключ.
+                </p>
+
+                <!-- CTA Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <a href="#projects" onclick="trackClick('Hero: Смотреть работы')" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 text-slate-950 font-bold text-sm hover:opacity-95 shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 min-h-[48px]">
+                        <span>Смотреть работы</span>
+                        <i class="fa-solid fa-arrow-down text-xs"></i>
+                    </a>
+                    <a href="https://t.me" target="_blank" onclick="trackClick('Hero: Написать в Telegram')" class="w-full sm:w-auto px-7 py-3.5 rounded-xl glass-panel text-white font-semibold text-sm hover:bg-white/10 hover:border-gray-500 transition-all flex items-center justify-center gap-2 min-h-[48px]">
+                        <i class="fa-brands fa-telegram text-sky-400 text-base"></i>
+                        <span>Написать в Telegram</span>
+                    </a>
+                </div>
+
+                <!-- Stats Highlight Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 pt-10 max-w-2xl mx-auto text-left">
+                    <div class="glass-card p-4 rounded-2xl border border-borderLine">
+                        <div class="text-2xl font-bold text-white font-mono">100%</div>
+                        <div class="text-xs text-gray-400 mt-1">Соблюдение сроков</div>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl border border-borderLine">
+                        <div class="text-2xl font-bold text-emerald-400 font-mono">24/7</div>
+                        <div class="text-xs text-gray-400 mt-1">Аптайм скриптов</div>
+                    </div>
+                    <div class="grid-col-span-2 md:col-span-1 glass-card p-4 rounded-2xl border border-borderLine">
+                        <div class="text-2xl font-bold text-sky-400 font-mono">35+</div>
+                        <div class="text-xs text-gray-400 mt-1">Готовых кейсов</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-12 border-y border-borderLine/50 bg-black/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-xs font-mono uppercase tracking-widest text-gray-500 mb-8">Технологический стек & Инструменты</p>
+                <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-xs font-mono">
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-sky-300 flex items-center gap-2"><i class="fa-brands fa-python text-sm"></i> Python 3.11+</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-robot text-sm"></i> Aiogram 3</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-purple-300 flex items-center gap-2"><i class="fa-solid fa-spider text-sm"></i> Playwright / Scrapy</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-amber-300 flex items-center gap-2"><i class="fa-brands fa-js text-sm"></i> JS / ES6+</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-cyan-300 flex items-center gap-2"><i class="fa-solid fa-code text-sm"></i> Tailwind CSS</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-blue-300 flex items-center gap-2"><i class="fa-solid fa-database text-sm"></i> PostgreSQL / Redis</span>
+                    <span class="px-3.5 py-2 rounded-xl glass-card text-orange-300 flex items-center gap-2"><i class="fa-brands fa-docker text-sm"></i> Docker</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Портфолио проектов</h2>
+                    <p class="text-gray-400 text-sm mt-2">Выполненные задачи, демонстрационные кейсы и исходный код</p>
+                </div>
+
+                <!-- Filters Pills -->
+                <div class="flex flex-wrap gap-2" id="filterContainer">
+                    <button onclick="setFilter('all', this)" class="filter-btn active px-4 py-2 rounded-xl text-xs font-semibold bg-sky-500 text-slate-950 transition">Все</button>
+                    <button onclick="setFilter('parser', this)" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold glass-panel text-gray-400 hover:text-white transition">Python & Парсинг</button>
+                    <button onclick="setFilter('bot', this)" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold glass-panel text-gray-400 hover:text-white transition">Telegram Боты</button>
+                    <button onclick="setFilter('web', this)" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold glass-panel text-gray-400 hover:text-white transition">Веб-Разработка</button>
+                </div>
+            </div>
+
+            <!-- Projects Grid Container -->
+            <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards dynamically generated via JavaScript -->
+            </div>
+        </section>
+
+        <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-borderLine relative overflow-hidden">
+                <div class="max-w-3xl">
+                    <h2 class="text-2xl font-bold text-white mb-4">О процессе разработки</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
+                        Я специализируюсь на создании решений, которые экономят время бизнеса и автоматизируют рутину. 
+                        Пишу чистый, поддерживаемый код на Python и JavaScript, настраиваю асинхронную обработку данных и интегрирую решения с внешними сервисами.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-400 font-mono">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Автоматический обход Cloudflare и капчи</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Подключение мобильных прокси с ротацией</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Интеграция с Telegram Bot API и Webhooks</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Чистый и адаптированный веб-интерфейс</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacts Section -->
+        <section id="contacts" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+            <div class="max-w-xl mx-auto space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Готовы обсудить ваш проект?</h2>
+                <p class="text-gray-400 text-sm">Свяжитесь со мной напрямую для бесплатной оценки задачи и консультации.</p>
+                <div class="flex justify-center gap-4 pt-2">
+                    <a href="https://t.me" target="_blank" onclick="trackClick('Contacts: Telegram')" class="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm transition flex items-center gap-2">
+                        <i class="fa-brands fa-telegram text-base"></i> Telegram
+                    </a>
+                    <a href="https://github.com" target="_blank" onclick="trackClick('Contacts: GitHub')" class="px-6 py-3 rounded-xl glass-panel hover:bg-white/10 text-white font-semibold text-sm transition flex items-center gap-2">
+                        <i class="fa-brands fa-github text-base"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-borderLine py-8 px-4 text-center text-xs text-gray-500">
+        <p>© <span id="year">2026</span> DevCraft Portfolio. Все права защищены.</p>
+    </footer>
+
+
+    <!-- 1. AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-borderLine modal-animate relative">
+            <button onclick="closeModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-sky-500/10 border border-sky-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-sky-400">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Вход в систему</h3>
+                <p class="text-xs text-gray-400 mt-1">Панель управления портфолио</p>
+            </div>
+
+            <form onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1.5">Логин</label>
+                    <input type="text" id="authLogin" required placeholder="admin" class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1.5">Пароль или PIN</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition">
+                </div>
+                
+                <div class="text-xs text-gray-500 bg-black/30 p-3 rounded-xl font-mono">
+                    💡 Данные по умолчанию: <br>
+                    • Логин: <span class="text-sky-400">admin</span> | Пароль: <span class="text-sky-400">admin123</span><br>
+                    • Или быстый PIN: <span class="text-sky-400">1337</span>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm rounded-xl transition min-h-[44px]">
+                    Войти в аккаунт
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. PROJECT VIEW DETAILS MODAL -->
+    <div id="projectModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl border border-borderLine modal-animate overflow-hidden my-8 relative">
+            <button onclick="closeModal('projectModal')" class="absolute top-4 right-4 z-10 w-9 h-9 bg-black/60 hover:bg-black text-white rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="h-64 sm:h-80 w-full relative bg-slate-900">
+                <img id="modalProjImg" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent"></div>
+                <span id="modalProjCategory" class="absolute bottom-4 left-6 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-mono uppercase"></span>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6">
+                <div>
+                    <h3 id="modalProjTitle" class="text-2xl font-extrabold text-white"></h3>
+                    <div id="modalProjTags" class="flex flex-wrap gap-2 mt-3"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="text-xs font-mono uppercase text-gray-400 tracking-wider">Описание проекта & Стека</h4>
+                    <p id="modalProjDesc" class="text-gray-300 text-sm leading-relaxed whitespace-pre-line"></p>
+                </div>
+
+                <div class="pt-4 border-t border-borderLine flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <span id="modalProjViews" class="text-xs text-gray-500 font-mono"></span>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <a id="modalProjLink" href="#" target="_blank" onclick="trackClick('Modal: Live Demo Link')" class="flex-1 sm:flex-none px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl transition text-center min-h-[40px] flex items-center justify-center gap-2">
+                            <span>Открыть демо / GitHub</span>
+                            <i class="fa-solid fa-external-link text-xs"></i>
+                        </a>
+                        <a href="https://t.me" target="_blank" onclick="trackClick('Modal: Order Similar')" class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-semibold text-xs rounded-xl transition text-center min-h-[40px] flex items-center justify-center gap-2">
+                            <span>Заказать похожий</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ADD / EDIT PROJECT MODAL (ADMIN) -->
+    <div id="addModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-xl rounded-2xl p-6 border border-borderLine modal-animate relative my-8">
+            <button onclick="closeModal('addModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 id="addModalTitle" class="text-xl font-bold text-white mb-4">Добавить проект в портфолио</h3>
+
+            <form onsubmit="handleSaveProject(event)" class="space-y-4">
+                <input type="hidden" id="editProjId" value="">
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">Название проекта</label>
+                    <input type="text" id="formTitle" required placeholder="Например: Парсер авто-порталов" class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-1">Категория</label>
+                        <select id="formCategory" class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                            <option value="parser">Python & Парсинг</option>
+                            <option value="bot">Telegram Бот</option>
+                            <option value="web">Веб-Разработка</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-1">Ссылка на обложку (URL)</label>
+                        <input type="url" id="formImg" required placeholder="https://images.unsplash.com/..." class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">Краткое описание (для карточки)</label>
+                    <input type="text" id="formShortDesc" required placeholder="Краткая суть проекта..." class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">Полное описание (для модалки)</label>
+                    <textarea id="formFullDesc" rows="4" required placeholder="Подробное описание задачи, решения и результатов..." class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">Стек технологий (через запятую)</label>
+                    <input type="text" id="formTags" placeholder="Python, Playwright, Redis, FastAPI" class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">Ссылка на демо / GitHub (необязательно)</label>
+                    <input type="text" id="formLink" placeholder="https://github.com/..." class="w-full bg-darkBg/80 border border-borderLine rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-xl transition min-h-[44px]">
+                    Сохранить проект
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. ANALYTICS DASHBOARD MODAL (ADMIN) -->
+    <div id="statsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 border border-borderLine modal-animate relative my-8">
+            <button onclick="closeModal('statsModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-sky-400"></i> Аналитика и Статистика
+            </h3>
+
+            <!-- Stats Grid Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                <div class="bg-black/40 border border-borderLine p-4 rounded-2xl">
+                    <div class="text-xs text-gray-400 font-mono">Всего заходов</div>
+                    <div id="statVisits" class="text-2xl font-extrabold text-sky-400 mt-1">0</div>
+                </div>
+                <div class="bg-black/40 border border-borderLine p-4 rounded-2xl">
+                    <div class="text-xs text-gray-400 font-mono">Клики по кнопкам</div>
+                    <div id="statClicks" class="text-2xl font-extrabold text-emerald-400 mt-1">0</div>
+                </div>
+                <div class="bg-black/40 border border-borderLine p-4 rounded-2xl">
+                    <div class="text-xs text-gray-400 font-mono">Мобильные (%):</div>
+                    <div id="statMobile" class="text-2xl font-extrabold text-purple-400 mt-1">0%</div>
+                </div>
+                <div class="bg-black/40 border border-borderLine p-4 rounded-2xl">
+                    <div class="text-xs text-gray-400 font-mono">Проектов в базе</div>
+                    <div id="statProjectsCount" class="text-2xl font-extrabold text-amber-400 mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- Activity Logs Table -->
+            <h4 class="text-xs font-mono uppercase text-gray-400 mb-3 tracking-wider">Последние события (Лог активности)</h4>
+            <div class="max-h-60 overflow-y-auto border border-borderLine rounded-2xl bg-black/30">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-black/50 text-gray-400 font-mono border-b border-borderLine sticky top-0">
+                        <tr>
+                            <th class="p-3">Время</th>
+                            <th class="p-3">Событие</th>
+                            <th class="p-3">Детали</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="divide-y divide-borderLine/50 font-mono">
+                        <!-- Dynamic logs -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Pre-populated Projects
+        const defaultProjects = [
+            {
+                id: 1,
+                title: "Парсер авто-порталов (Auto.ru / Drom / av.by)",
+                category: "parser",
+                img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+                shortDesc: "Высоконагруженный парсер объявлений авто с эмуляцией TLS-отпечатков, ротацией прокси и отправкой в Telegram.",
+                fullDesc: "Разработан асинхронный скрипт для круглосуточного мониторинга свежих объявлений с основных авто-площадок.\n\n• Обход Cloudflare & Akamai за счет использования Playwright и Stealth-плагинов.\n• Ротация мобильных и серверных прокси с контролем IP.\n• Моментальные уведомления в Telegram-чат за < 1.5 секунды после появления объявления.",
+                tags: ["Python 3.11", "Playwright", "Asyncio", "Mobile Proxies", "Telegram API"],
+                link: "https://github.com",
+                views: 142
+            },
+            {
+                id: 2,
+                title: "Espresso & Co — Кофейня & Доставка",
+                category: "web",
+                img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+                shortDesc: "Современный веб-сайт кофейни с интерактивным меню, онлайн-корзиной и отправкой заказов в Telegram.",
+                fullDesc: "Полный цикл разработки интерактивного веб-приложения для сети кофеен.\n\n• Адаптированный стек для мобильных устройств (PWA-feel).\n• Интерактивная корзина с динамическим подсчетом блюд и скидок.\n• Интеграция с Telegram Bot API: готовый чек заказа отправляется в чат курьерам.",
+                tags: ["HTML5", "JavaScript ES6+", "Tailwind CSS", "Telegram Webhook"],
+                link: "https://github.com",
+                views: 215
+            },
+            {
+                id: 3,
+                title: "Telegram LeadGen & AI Assistant Bot",
+                category: "bot",
+                img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+                shortDesc: "Многофункциональный чат-бот на Aiogram 3 с квалификацией лидов, интеграцией OpenAI GPT и платежами.",
+                fullDesc: "Умный помощник для обработки входящих заявок в мессенджере.\n\n• Автоматическая квалификация лидов и запись данных в PostgreSQL.\n• Подключение OpenAI GPT API для консультаций по сложному прайсу.\n• Прием платежей через ЮKassa / CryptoPay прямо внутри диалога.",
+                tags: ["Python", "Aiogram 3", "OpenAI API", "PostgreSQL", "Redis"],
+                link: "https://github.com",
+                views: 98
+            }
+        ];
+
+        // State Management
+        let projects = JSON.parse(localStorage.getItem('dev_projects_v3')) || defaultProjects;
+        let stats = JSON.parse(localStorage.getItem('dev_stats_v3')) || {
+            visits: 0,
+            clicks: 0,
+            mobileVisits: 0,
+            desktopVisits: 0,
+            logs: []
+        };
+        let isAdmin = localStorage.getItem('dev_is_admin') === 'true';
+        let currentFilter = 'all';
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initStats();
+            renderProjects();
+            updateAdminStateUI();
+        });
+
+        // Save Helpers
+        function saveProjects() { localStorage.setItem('dev_projects_v3', JSON.stringify(projects)); }
+        function saveStats() { localStorage.setItem('dev_stats_v3', JSON.stringify(stats)); }
+
+        // Analytics Tracker
+        function initStats() {
+            stats.visits++;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) stats.mobileVisits++; else stats.desktopVisits++;
+
+            stats.logs.unshift({
+                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                event: 'Заход на сайт',
+                details: isMobile ? 'Смартфон' : 'Десктоп ПК'
+            });
+            if (stats.logs.length > 50) stats.logs.pop();
+            saveStats();
+        }
+
+        function trackClick(actionName) {
+            stats.clicks++;
+            stats.logs.unshift({
+                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                event: 'Клик',
+                details: actionName
+            });
+            if (stats.logs.length > 50) stats.logs.pop();
+            saveStats();
+        }
+
+        // Render Projects Grid
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'all' ? projects : projects.filter(p => p.category === currentFilter);
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl overflow-hidden flex flex-col group relative border border-borderLine';
+                
+                const categoryBadge = p.category === 'parser' ? 'Python & Парсинг' : (p.category === 'bot' ? 'Telegram Бот' : 'Веб-Разработка');
+
+                card.innerHTML = `
+                    ${isAdmin ? `
+                        <div class="absolute top-3 right-3 z-20 flex gap-1.5">
+                            <button onclick="openEditModal(${p.id}, event)" class="w-8 h-8 rounded-lg bg-sky-500/80 hover:bg-sky-500 text-slate-950 flex items-center justify-center transition shadow">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteProject(${p.id}, event)" class="w-8 h-8 rounded-lg bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition shadow">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <div class="h-48 w-full overflow-hidden relative cursor-pointer" onclick="openProjectModal(${p.id})">
+                        <img src="${p.img}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent opacity-80"></div>
+                        <span class="absolute bottom-3 left-4 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-sky-400 text-[10px] font-mono uppercase">
+                            ${categoryBadge}
+                        </span>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 onclick="openProjectModal(${p.id})" class="text-lg font-bold text-white hover:text-sky-400 transition cursor-pointer leading-snug">
+                                ${p.title}
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">
+                                ${p.shortDesc}
+                            </p>
+                        </div>
+
+                        <div class="space-y-4 pt-2">
+                            <div class="flex flex-wrap gap-1.5">
+                                ${p.tags.slice(0, 3).map(tag => `<span class="px-2 py-0.5 rounded bg-white/5 text-[10px] font-mono text-gray-300 border border-white/5">${tag}</span>`).join('')}
+                                ${p.tags.length > 3 ? `<span class="text-[10px] font-mono text-gray-500 align-middle">+${p.tags.length - 3}</span>` : ''}
+                            </div>
+
+                            <div class="flex items-center justify-between pt-3 border-t border-borderLine text-xs">
+                                <span class="text-gray-500 font-mono flex items-center gap-1">
+                                    <i class="fa-regular fa-eye"></i> ${p.views}
+                                </span>
+                                <button onclick="openProjectModal(${p.id})" class="text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-1 transition">
+                                    <span>Подробнее</span>
+                                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter Controls
+        function setFilter(cat, btn) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = 'filter-btn px-4 py-2 rounded-xl text-xs font-semibold glass-panel text-gray-400 hover:text-white transition';
+            });
+            btn.className = 'filter-btn active px-4 py-2 rounded-xl text-xs font-semibold bg-sky-500 text-slate-950 transition';
+            renderProjects();
+        }
+
+        // Project Modal Handling
+        function openProjectModal(id) {
+            const p = projects.find(item => item.id === id);
+            if (!p) return;
+
+            p.views = (p.views || 0) + 1;
+            saveProjects();
+            renderProjects();
+
+            document.getElementById('modalProjImg').src = p.img;
+            document.getElementById('modalProjCategory').textContent = p.category === 'parser' ? 'Python & Парсинг' : (p.category === 'bot' ? 'Telegram Бот' : 'Веб-Разработка');
+            document.getElementById('modalProjTitle').textContent = p.title;
+            document.getElementById('modalProjDesc').textContent = p.fullDesc || p.shortDesc;
+            document.getElementById('modalProjViews').innerHTML = `<i class="fa-regular fa-eye"></i> ${p.views} просмотров`;
+
+            const tagsContainer = document.getElementById('modalProjTags');
+            tagsContainer.innerHTML = p.tags.map(t => `<span class="px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-mono">${t}</span>`).join('');
+
+            const linkBtn = document.getElementById('modalProjLink');
+            if (p.link) {
+                linkBtn.href = p.link;
+                linkBtn.classList.remove('hidden');
+            } else {
+                linkBtn.classList.add('hidden');
+            }
+
+            document.getElementById('projectModal').classList.remove('hidden');
+            trackClick(`View Details: ${p.title}`);
+        }
+
+        // Admin Auth Flow
+        function toggleAuthModal() {
+            if (isAdmin) {
+                logoutAdmin();
+            } else {
+                document.getElementById('authModal').classList.remove('hidden');
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const u = document.getElementById('authLogin').value.trim();
+            const p = document.getElementById('authPassword').value.trim();
+
+            if ((u === 'admin' && p === 'admin123') || p === '1337') {
+                isAdmin = true;
+                localStorage.setItem('dev_is_admin', 'true');
+                closeModal('authModal');
+                updateAdminStateUI();
+                renderProjects();
+                trackClick('Admin Logged In');
+            } else {
+                alert('Ошибка авторизации! Проверьте логин и пароль.');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            localStorage.setItem('dev_is_admin', 'false');
+            updateAdminStateUI();
+            renderProjects();
+        }
+
+        function updateAdminStateUI() {
+            const adminBar = document.getElementById('adminBar');
+            const authBtn = document.getElementById('authBtn');
+
+            if (isAdmin) {
+                adminBar.classList.remove('hidden');
+                authBtn.innerHTML = `<i class="fa-solid fa-user-shield text-xs"></i> <span>Админ</span>`;
+                authBtn.className = 'px-4 py-2 rounded-xl text-sm font-semibold border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition flex items-center gap-2 min-h-[40px]';
+            } else {
+                adminBar.classList.add('hidden');
+                authBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket text-xs"></i> <span>Вход</span>`;
+                authBtn.className = 'px-4 py-2 rounded-xl text-sm font-semibold border border-sky-500/30 text-sky-400 hover:bg-sky-500/10 hover:border-sky-500/60 transition flex items-center gap-2 min-h-[40px]';
+            }
+        }
+
+        // Add / Edit Project (Admin)
+        function openAddModal() {
+            document.getElementById('addModalTitle').textContent = 'Добавить проект в портфолио';
+            document.getElementById('editProjId').value = '';
+            document.getElementById('formTitle').value = '';
+            document.getElementById('formCategory').value = 'parser';
+            document.getElementById('formImg').value = '';
+            document.getElementById('formShortDesc').value = '';
+            document.getElementById('formFullDesc').value = '';
+            document.getElementById('formTags').value = '';
+            document.getElementById('formLink').value = '';
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function openEditModal(id, event) {
+            event.stopPropagation();
+            const p = projects.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('addModalTitle').textContent = 'Редактировать проект';
+            document.getElementById('editProjId').value = p.id;
+            document.getElementById('formTitle').value = p.title;
+            document.getElementById('formCategory').value = p.category;
+            document.getElementById('formImg').value = p.img;
+            document.getElementById('formShortDesc').value = p.shortDesc;
+            document.getElementById('formFullDesc').value = p.fullDesc || '';
+            document.getElementById('formTags').value = p.tags.join(', ');
+            document.getElementById('formLink').value = p.link || '';
+
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function handleSaveProject(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editProjId').value;
+            const tagsArr = document.getElementById('formTags').value.split(',').map(t => t.trim()).filter(Boolean);
+
+            if (editId) {
+                const index = projects.findIndex(p => p.id == editId);
+                if (index !== -1) {
+                    projects[index] = {
+                        ...projects[index],
+                        title: document.getElementById('formTitle').value,
+                        category: document.getElementById('formCategory').value,
+                        img: document.getElementById('formImg').value,
+                        shortDesc: document.getElementById('formShortDesc').value,
+                        fullDesc: document.getElementById('formFullDesc').value,
+                        tags: tagsArr.length ? tagsArr : ["Python"],
+                        link: document.getElementById('formLink').value
+                    };
+                }
+            } else {
+                const newProject = {
+                    id: Date.now(),
+                    title: document.getElementById('formTitle').value,
+                    category: document.getElementById('formCategory').value,
+                    img: document.getElementById('formImg').value,
+                    shortDesc: document.getElementById('formShortDesc').value,
+                    fullDesc: document.getElementById('formFullDesc').value,
+                    tags: tagsArr.length ? tagsArr : ["Python"],
+                    link: document.getElementById('formLink').value,
+                    views: 0
+                };
+                projects.unshift(newProject);
+            }
+
+            saveProjects();
+            renderProjects();
+            closeModal('addModal');
+        }
+
+        function deleteProject(id, event) {
+            event.stopPropagation();
+            if (confirm('Удалить проект из портфолио?')) {
+                projects = projects.filter(p => p.id !== id);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        // Stats Dashboard
+        function openStatsModal() {
+            document.getElementById('statVisits').textContent = stats.visits;
+            document.getElementById('statClicks').textContent = stats.clicks;
+            document.getElementById('statProjectsCount').textContent = projects.length;
+
+            const total = (stats.mobileVisits + stats.desktopVisits) || 1;
+            const mobilePerc = Math.round((stats.mobileVisits / total) * 100);
+            document.getElementById('statMobile').textContent = `${mobilePerc}%`;
+
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = stats.logs.slice(0, 20).map(l => `
+                <tr class="hover:bg-white/5">
+                    <td class="p-3 text-gray-400">${l.time}</td>
+                    <td class="p-3 font-semibold text-sky-400">${l.event}</td>
+                    <td class="p-3 text-gray-300">${l.details}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        // General Modal Helpers
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
