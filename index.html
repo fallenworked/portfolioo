@@ -88,7 +88,7 @@
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen relative font-sans overflow-x-hidden">
+<body class="text-slate-100 min-h-screen relative font-sans overflow-x-hidden flex flex-col justify-between">
 
     <!-- Ambient Liquid Glass Background Orbs -->
     <div class="orb w-96 h-96 bg-blue-600/20 top-[-5%] left-[-5%]"></div>
@@ -101,62 +101,81 @@
         <span id="toastMsg">Сообщение</span>
     </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-40 glass-panel border-b border-blue-500/15">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center relative">
+    <div>
+        <!-- Header -->
+        <header class="sticky top-0 z-40 glass-panel border-b border-blue-500/15">
+            <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center relative">
+                
+                <!-- Logo / Secret Click Target -->
+                <div onclick="handleSecretClick()" class="cursor-pointer select-none group flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-105 transition">
+                        <i class="fas fa-code text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold tracking-wide bg-gradient-to-r from-white via-sky-100 to-blue-300 bg-clip-text text-transparent">
+                            fallenwork
+                        </span>
+                        <span class="text-sky-400 font-semibold text-lg">.dev</span>
+                    </div>
+                </div>
+
+                <!-- Right Contacts & Admin Actions -->
+                <div class="flex items-center gap-4">
+                    <a href="https://t.me/caxaold" target="_blank" class="glass-panel px-4 py-2 rounded-xl text-xs font-medium text-sky-200 hover:text-white hover:border-sky-400/40 transition flex items-center gap-2">
+                        <i class="fab fa-telegram text-sky-400 text-sm"></i>
+                        <span>@caxaold</span>
+                    </a>
+
+                    <!-- Add Button (Hidden until 3 clicks) -->
+                    <button id="addBtn" onclick="openModal()" class="hidden bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/25 transition transform active:scale-95 flex items-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        <span>Добавить кейс</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto px-6 py-10 relative z-10">
             
-            <!-- Logo / Secret Click Target -->
-            <div onclick="handleSecretClick()" class="cursor-pointer select-none group flex items-center gap-2">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-105 transition">
-                    <i class="fas fa-code text-white text-sm"></i>
-                </div>
-                <div>
-                    <span class="text-lg font-bold tracking-wide bg-gradient-to-r from-white via-sky-100 to-blue-300 bg-clip-text text-transparent">
-                        fallenwork
-                    </span>
-                    <span class="text-sky-400 font-semibold text-lg">.dev</span>
-                </div>
+            <!-- Hero Title -->
+            <div class="mb-10 text-center md:text-left">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-3">
+                    Портфолио проектов
+                </h2>
+                <p class="text-slate-400 text-sm max-w-xl leading-relaxed">
+                    Разработка высокопроизводительных парсеров, автоматизация сбора данных, Telegram-боты с интеграцией ИИ и крипто-аналитика.
+                </p>
             </div>
 
-            <!-- Right Contacts & Admin Actions -->
-            <div class="flex items-center gap-4">
-                <a href="https://t.me/caxaold" target="_blank" class="glass-panel px-4 py-2 rounded-xl text-xs font-medium text-sky-200 hover:text-white hover:border-sky-400/40 transition flex items-center gap-2">
-                    <i class="fab fa-telegram text-sky-400 text-sm"></i>
-                    <span>@caxaold</span>
-                </a>
+            <!-- Dynamic Category Filter -->
+            <div class="flex gap-2.5 overflow-x-auto pb-4 mb-8 scrollbar-none" id="categoryFilters">
+                <!-- JS dynamic tabs -->
+            </div>
 
-                <!-- Add Button (Hidden until 3 clicks) -->
-                <button id="addBtn" onclick="openModal()" class="hidden bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/25 transition transform active:scale-95 flex items-center gap-2">
-                    <i class="fas fa-plus"></i>
-                    <span>Добавить кейс</span>
-                </button>
+            <!-- Projects Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+                <!-- JS dynamic cards -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer / Подвал сайта -->
+    <footer class="w-full glass-panel border-t border-blue-500/15 mt-16 py-8 relative z-10">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+                <span class="font-bold tracking-wide text-white">fallenwork<span class="text-sky-400">.dev</span></span>
+                <span class="text-slate-600">•</span>
+                <span>© 2026 Все права защищены</span>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <span class="text-slate-300 font-medium">Мамсиров Алим Аскербиевич</span>
+                <span class="text-sky-300 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-400/20 font-mono">
+                    ИНН 010105653934
+                </span>
             </div>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-6 py-10 relative z-10">
-        
-        <!-- Hero Title -->
-        <div class="mb-10 text-center md:text-left">
-            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-3">
-                Портфолио проектов
-            </h2>
-            <p class="text-slate-400 text-sm max-w-xl leading-relaxed">
-                Разработка высокопроизводительных парсеров, автоматизация сбора данных, Telegram-боты с интеграцией ИИ и крипто-аналитика.
-            </p>
-        </div>
-
-        <!-- Dynamic Category Filter -->
-        <div class="flex gap-2.5 overflow-x-auto pb-4 mb-8 scrollbar-none" id="categoryFilters">
-            <!-- JS dynamic tabs -->
-        </div>
-
-        <!-- Projects Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
-            <!-- JS dynamic cards -->
-        </div>
-    </main>
+    </footer>
 
     <!-- Modal Form (Glassmorphism Modal) -->
     <div id="modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 transition-opacity duration-300">
